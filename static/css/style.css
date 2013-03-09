@@ -13,7 +13,9 @@
   text-align:center; 
 }
 
-
+#ep_narration_begin_recording {
+  color: #535353;
+}
 
 #recorderFlashContainer {
   z-index:1;

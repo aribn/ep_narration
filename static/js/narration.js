@@ -41,37 +41,40 @@ var narration = {
     e.preventDefault();
   },
 
-
+  
   /* Sends the narration cues and URL to the server */
   send: function (){
     var padId = narration.getPadId();
     var url = narration.gup("narration_url");
-
+  
     var data = {
       type      : 'NARRATION_SAVE',
       component : 'pad',
-      cues      : cues, // TODO Ari
-      url       : url, // TODO Ari
+      cues      : narration.cues, // JSON.stringify(cues) ???
+      url       : url, // or narration_url ??
       padId     : padId
     }
-
-
+  
     socket.json.send(
     {
       type: "COLLABROOM",
       component: "pad",
       data: data
     });
-
+  
   },
-
+  
   /* Recieved cues from server, shove em into our page */
   recieve: function(msg){
     cues = msg.cues;
+    
+    console.log("cues received (may be a good place to queue up popcorn events)", cues);
   },
 
   /* Requests the narration cues from the server */
   request: function(url){
+    console.log("cues requested");
+
     var padId = narration.getPadId();
     var message = {};
 
@@ -258,27 +261,15 @@ var narration = {
     
   },
   
-  saveCueData: function(narration_url, callback) { 
-    // $.ajax({
-    //   type: 'post',
-    //   url: '/p/pad/narration',
-    //   data: {
-    //     padId: pad.getPadId(),
-    //     cues: JSON.stringify(cueData),
-    //     narration_url: narration_url
-    //   },
-    //   success: function(e) {
-    //     console.log("success! " + e);
-        callback();
-    //   },
-    //   error: function(e) {
-    //     console.log("error: " + e);
-    //   }
-    // });
-  }, 
-  
+  // when finished recording...
   generateCueData: function() {
     cueData = {};
+    
+    console.log("we need to generate cue data here. for now, fake it");
+    cueData[5]=2;
+    cueData[8]=3;
+    
+    
     // $.getJSON(
     //   "/p/pad/changes/"+clientVars.readOnlyId+"?s=0&g=0",
     //   function(data, textStatus) {
@@ -332,6 +323,32 @@ var narration = {
     // );  
   }, 
 
+  
+  
+  saveCueData: function(narration_url, callback) { 
+
+    narration.send();
+
+    // $.ajax({
+    //   type: 'post',
+    //   url: '/p/pad/narration',
+    //   data: {
+    //     padId: pad.getPadId(),
+    //     cues: JSON.stringify(cueData),
+    //     narration_url: narration_url
+    //   },
+    //   success: function(e) {
+    //     console.log("success! " + e);
+        callback();
+    //   },
+    //   error: function(e) {
+    //     console.log("error: " + e);
+    //   }
+    // });
+  }, 
+  
+  
+  
   updateTimer: function(ms){
     if (ms==0) {
       $("#timer").hide();  
