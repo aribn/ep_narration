@@ -55,7 +55,7 @@ var narration = {
       padId     : padId
     }
   
-    socket.json.send(
+    pad.socket.json.send(
     {
       type: "COLLABROOM",
       component: "pad",
@@ -83,8 +83,8 @@ var narration = {
       component : 'pad',
       padId     : padId
     }
-
-    socket.json.send(
+    
+    pad.socket.json.send(
     {
       type: "COLLABROOM",
       component: "pad",
