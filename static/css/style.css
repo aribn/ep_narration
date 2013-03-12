@@ -17,6 +17,10 @@
   color: #535353;
 }
 
+#exportlink {
+  display:none;
+}
+
 #recorderFlashContainer {
   z-index:1;
 }

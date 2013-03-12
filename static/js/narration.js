@@ -18,6 +18,7 @@ exports.handleClientMessage_narration = function(hook, context){
 
 var narration = {
   
+  popcorn : null, 
   cues : {},
 
   /* When the user clicks the record button */
@@ -42,7 +43,7 @@ var narration = {
   },
 
   
-  /* Sends the narration cues and URL to the server */
+  /* After recording, sends the narration cues and URL to the server */
   send: function (){
     var padId = narration.getPadId();
     var url = narration.gup("narration_url");
@@ -55,6 +56,9 @@ var narration = {
       padId     : padId
     }
   
+    console.log("about to send: ", data);
+    console.log("narration.cues: ", narration.cues);
+  
     pad.socket.json.send(
     {
       type: "COLLABROOM",
@@ -64,17 +68,31 @@ var narration = {
   
   },
   
-  /* Recieved cues from server, shove em into our page */
+  /* recieved cues from server, shove em into our page */
   recieve: function(msg){
-    cues = msg.cues;
+    console.log("recieved!!!!!!!!!!!!!!");
+    narration.cues = msg.cues;    
     
-    console.log("cues received (may be a good place to queue up popcorn events)", cues);
+    console.log("cues recieved:", narration.cues, msg);
+    
+    popcorn.on( "load", function() {
+      $.each(narration.cues, function(timestamp, revision) { 
+        console.log("wiring:", timestamp, revision);
+        popcorn.code({
+          start: timestamp, 
+          onStart: function() {
+            console.log("updating time slider at time "+timestamp+" to rev."+revision);
+            BroadcastSlider.setSliderPosition(revision);
+          }
+        });
+      });
+    });
   },
 
   /* Requests the narration cues from the server */
-  request: function(url){
-    console.log("cues requested");
-
+  request: function(){
+    console.log("request");
+    
     var padId = narration.getPadId();
     var message = {};
 
@@ -84,7 +102,9 @@ var narration = {
       padId     : padId
     }
     
-    pad.socket.json.send(
+    console.log("cues requested for: ", data);
+
+    socket.json.send(
     {
       type: "COLLABROOM",
       component: "pad",
@@ -104,32 +124,13 @@ var narration = {
     $(".soundcloud-url").attr("href", narration_url);
     
     $('#timeslider-wrapper').hide();
-    var popcorn = Popcorn.soundcloud( "#soundCloudTopContainer", narration_url, { frameAnimation: true } );    
+    popcorn = Popcorn.soundcloud( "#soundCloudTopContainer", narration_url, { frameAnimation: true } );    
     
     popcorn.media.addEventListener( "readystatechange", function() {
       $("#soundcloud-loading-placeholder").hide();
     });
 
-    popcorn.on( "load", function() {
-      
-      // nothing here!
-      var narration_cues = narration.request(narration_url); 
-      
-      console.log("narration_cues", narration_cues);
-      
-      // $.each(narration_cues, function(timestamp, revision) { 
-      //   
-      //   popcorn.code({
-      //     start: timestamp, 
-      //     onStart: function() {
-      //       console.log("updating time slider at time "+timestamp+" to rev."+revision);
-      //       BroadcastSlider.setSliderPosition(revision);
-      //     }
-      //   });
-      //   
-      // });
-        
-    });
+    narration.request(); 
   },
 
   gup: function(name, url) { // gets url parameters
@@ -263,11 +264,11 @@ var narration = {
   
   // when finished recording...
   generateCueData: function() {
-    cueData = {};
+    // cueData = {};
     
     console.log("we need to generate cue data here. for now, fake it");
-    cueData[5]=2;
-    cueData[8]=3;
+    narration.cues[5]=2;
+    narration.cues[8]=3;
     
     
     // $.getJSON(
@@ -327,6 +328,8 @@ var narration = {
   
   saveCueData: function(narration_url, callback) { 
 
+    console.log(narration.cue)
+
     narration.send();
 
     // $.ajax({
@@ -374,7 +377,7 @@ var narration = {
   getPadId: function(){
     //get the padId out of the url
     var urlParts= document.location.pathname.split("/");
-    return padId = decodeURIComponent(urlParts[urlParts.length-2]);
+    return padId = decodeURIComponent(urlParts[2]);
   }
 }
 
