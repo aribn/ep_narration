@@ -16,10 +16,26 @@ exports.handleClientMessage_narration = function(hook, context){
   narration.recieve(context);
 }
 
+exports.aceEditEvent = function(hook_name, args, cb){
+  if(args.callstack.docTextChanged){ // Has the doc changed?
+    narration.event();
+  }
+}
+
 var narration = {
   
   popcorn : null, 
   cues : {},
+
+  event: function(){
+    var timeStamp = new Date().getTime();
+    var revNo = pad.getCollabRevisionNumber();
+    // doing revNo as key would be way more efficient as we could check to see if it exists in object and avoid duplicates.
+    if(!narration.cues[revNo]){
+      narration.cues[revNo] = timeStamp;
+    }
+    console.log(narration.cues);
+  },
 
   /* When the user clicks the record button */
   record: function(e){
