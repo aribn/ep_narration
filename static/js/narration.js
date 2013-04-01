@@ -265,8 +265,12 @@ var narration = {
   // when finished recording...
   generateCueData: function() {
     // cueData = {};
+    var initialRevisionNumber, recordingStartTime;
     
     console.log("we need to generate cue data here. for now, fake it");
+    
+    // narration.cues[timeInSeconds] = revisionNumber; 
+
     narration.cues[5]=2;
     narration.cues[8]=3;
     
@@ -327,27 +331,8 @@ var narration = {
   
   
   saveCueData: function(narration_url, callback) { 
-
-    console.log(narration.cue)
-
     narration.send();
-
-    // $.ajax({
-    //   type: 'post',
-    //   url: '/p/pad/narration',
-    //   data: {
-    //     padId: pad.getPadId(),
-    //     cues: JSON.stringify(cueData),
-    //     narration_url: narration_url
-    //   },
-    //   success: function(e) {
-    //     console.log("success! " + e);
-        callback();
-    //   },
-    //   error: function(e) {
-    //     console.log("error: " + e);
-    //   }
-    // });
+    callback();
   }, 
   
   
