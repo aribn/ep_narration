@@ -31,7 +31,9 @@ var narration = {
     var timeStamp = new Date().getTime();
     var revNo = pad.getCollabRevisionNumber();
     // doing revNo as key would be way more efficient as we could check to see if it exists in object and avoid duplicates.
-    narration.cues[timeStamp] = revNo;
+    if(!narration.cues[revNo]){
+      narration.cues[revNo] = timeStamp;
+    }
     console.log(narration.cues);
   },
 
