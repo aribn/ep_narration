@@ -16,6 +16,11 @@ exports.handleClientMessage_narration = function(hook, context){
   narration.recieve(context);
 }
 
+exports.aceEditEvent = function(hook_name, args, cb){
+  console.log("doc", args.editorInfo.ace_getDocument());
+  console.log(args);
+}
+
 var narration = {
   
   popcorn : null, 
