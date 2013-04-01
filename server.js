@@ -13,7 +13,7 @@ exports.handleMessage = function(hook_name, context, callback){
           payload: true
         }
       });
-      callback(null); // we process this here dont pass it onto any other message handler
+      callback([null]); // we process this here dont pass it onto any other message handler
       return false;
     }
   }
@@ -31,12 +31,12 @@ exports.handleMessage = function(hook_name, context, callback){
           }
         });
       });
-      callback(null); // we process this here dont pass it onto any other message handler
+      callback([null]); // we process this here dont pass it onto any other message handler
       return false;
     }
   }
-  callback(null);
-  return false;
+  callback(true);
+  // return false;
 }
 
 exports.registerRoute = function (hook_name, args, cb) {
