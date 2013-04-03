@@ -146,7 +146,10 @@ var narration = {
       $("#soundcloud-loading-placeholder").hide();
     });
 
-    narration.request(); 
+    setTimeout(function(){ // TODO use a promise or something here, this is to avoid a race condition
+      narration.request()
+    }, 1000);
+
   },
 
   gup: function(name, url) { // gets url parameters
