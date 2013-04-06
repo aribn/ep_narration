@@ -1,8 +1,9 @@
 var db = require('../../src/node/db/DB').db;
 var settings = require('ep_etherpad-lite/node/utils/Settings');
 
-// When a new NARRATION_SAVE message comes in from the client
 exports.handleMessage = function(hook_name, context, callback){
+
+  // When a new NARRATION_SAVE message comes in from the client
   if (context.message && context.message.data){
     if (context.message.data.type == 'NARRATION_SAVE' ) { // if it's a request to save a narration
       var padId = context.message.data.padId;
@@ -31,6 +32,7 @@ exports.handleMessage = function(hook_name, context, callback){
           }
         });
       });
+      
       callback([null]); // we process this here dont pass it onto any other message handler
       return false;
     }

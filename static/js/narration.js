@@ -1,3 +1,5 @@
+var initialTimeStamp = 0; 
+
 if(typeof exports == 'undefined'){
   var exports = this['mymodule'] = {};
 }
@@ -32,7 +34,7 @@ var narration = {
     var revNo = pad.getCollabRevisionNumber();
     // doing revNo as key would be way more efficient as we could check to see if it exists in object and avoid duplicates.
     if(!narration.cues[revNo]){
-      narration.cues[revNo] = timeStamp;
+      narration.cues[revNo] = timeStamp - initialTimeStamp;
     }
     console.log(narration.cues);
   },
@@ -86,28 +88,26 @@ var narration = {
   
   /* recieved cues from server, shove em into our page */
   recieve: function(msg){
-    console.log("recieved!!!!!!!!!!!!!!");
-    narration.cues = msg.cues;    
+    narration.cues = msg.data.data.cues;    
     
     console.log("cues recieved:", narration.cues, msg);
     
-    popcorn.on( "load", function() {
-      $.each(narration.cues, function(timestamp, revision) { 
-        console.log("wiring:", timestamp, revision);
-        popcorn.code({
-          start: timestamp, 
-          onStart: function() {
-            console.log("updating time slider at time "+timestamp+" to rev."+revision);
-            BroadcastSlider.setSliderPosition(revision);
-          }
-        });
+    $.each(narration.cues, function(revision, timestamp) { 
+      console.log("wiring:", timestamp, revision);
+      popcorn.code({
+        start: timestamp/1000.0, 
+        onStart: function() {
+          console.log("trying to update timeslider to rev."+revision);
+          clientVars.collab_client_vars.rev = revision;
+          window.location.hash = "#" + revision; 
+        }
       });
     });
   },
 
   /* Requests the narration cues from the server */
   request: function(){
-    console.log("request");
+    console.log("in request()");
     
     var padId = narration.getPadId();
     var message = {};
@@ -147,7 +147,9 @@ var narration = {
     });
 
     setTimeout(function(){ // TODO use a promise or something here, this is to avoid a race condition
-      narration.request()
+      console.log("pre-request");
+      narration.request();
+      console.log("post-request");
     }, 1000);
 
   },
@@ -186,9 +188,6 @@ var narration = {
       narration.setRecorderUIState("recorded");
       $(".secondary-link").show();
       SC.recordStop();
-
-      narration.generateCueData();
-
       e.preventDefault();
     });
 
@@ -277,77 +276,9 @@ var narration = {
 
       e.preventDefault();
     });
-    
-    
   },
   
-  // when finished recording...
-  generateCueData: function() {
-    // cueData = {};
-    var initialRevisionNumber, recordingStartTime;
-    
-    console.log("we need to generate cue data here. for now, fake it");
-    
-    // narration.cues[timeInSeconds] = revisionNumber; 
 
-    narration.cues[5]=2;
-    narration.cues[8]=3;
-    
-    
-    // $.getJSON(
-    //   "/p/pad/changes/"+clientVars.readOnlyId+"?s=0&g=0",
-    //   function(data, textStatus) {
-    //     if(textStatus !== "success") {
-    //       console.log(textStatus);
-    //     } 
-    // 
-    //     var initialPause = 0.2;       // a
-    //     var compressedSegment = 0.1;  // b
-    //     var etherpadSyncDelay = 1.5;  // c
-    // 
-    //     console.log("/change/ date: ", data);
-    //     // console.log("delta count: " + (data.timeDeltas).length); 
-    //     // console.log("At BEGINNING OF AUDIO, jump to revision " + initialRevisionNumber);
-    //     // console.log("rev."+initialRevisionNumber + " happened at time X: "+data.times[initialRevisionNumber]);
-    //     // console.log("AUDIO RECORDING started at time: " + recordingStartTime);
-    //     // console.log("rev."+(1+initialRevisionNumber) + " happened at time " + +data.times[initialRevisionNumber+1]);
-    //     // 
-    //     // console.log("");
-    // 
-    // 
-    //     // console.log("recordingStartTime: " + recordingStartTime);
-    //     console.log("At start of audio, jump to revision " + initialRevisionNumber + " (0 => "+initialPause+")");
-    //     cueData[initialPause] = initialRevisionNumber;
-    // 
-    //     if ((initialRevisionNumber+1) < (data.times).length) {
-    //       var i;
-    //       for (var i=initialRevisionNumber+1; i<(data.times).length; i++) {
-    //         var timeInSeconds = ((data.times[i]-recordingStartTime)/1000.0);
-    //         var trio = (initialPause + compressedSegment + etherpadSyncDelay);
-    //         var adjustedTimeInSeconds;
-    // 
-    //         if (timeInSeconds > trio) {
-    //           // subtract the time delay from later revisions. 
-    //           // i.e. for times from [(a+b+c)..(inf)], map to [(a+b)..(inf-c)]
-    //           adjustedTimeInSeconds = timeInSeconds - etherpadSyncDelay;
-    //         } else {
-    //           // since we can't subtract the full time delay, start after the beginning (a), and scale within b
-    //           // i.e. for times from [(0)...(a+b+c)], map to [(a)..(a+b)]
-    //           adjustedTimeInSeconds = (timeInSeconds / trio)*compressedSegment + initialPause;
-    //         }
-    // 
-    //         console.log("At time " + timeInSeconds + " in audio, jump to revision " + i + " ("+timeInSeconds+" => "+adjustedTimeInSeconds+")");
-    //         cueData[adjustedTimeInSeconds] = i;
-    //       }
-    // 
-    //     }
-    // 
-    //     console.log(cueData);
-    //   }
-    // );  
-  }, 
-
-  
   
   saveCueData: function(narration_url, callback) { 
     narration.send();
@@ -360,6 +291,7 @@ var narration = {
     if (ms==0) {
       $("#timer").hide();  
       $(".secondary-link").show();
+      initialTimeStamp = new Date().getTime();
     } else {
       var seconds = Math.floor(ms/1000.0) % 60;
       var minutes = Math.floor(Math.floor(ms/1000.0) / 60);
