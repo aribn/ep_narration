@@ -98,8 +98,7 @@ var narration = {
         start: timestamp/1000.0, 
         onStart: function() {
           console.log("trying to update timeslider to rev."+revision);
-          clientVars.collab_client_vars.rev = revision;
-          window.location.hash = "#" + revision; 
+          BroadcastSlider.setSliderPosition(revision);
         }
       });
     });
