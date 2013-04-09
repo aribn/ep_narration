@@ -16,7 +16,7 @@
         "aceEditEvent":"ep_narration/static/js/narration",
         "postTimesliderInit":"ep_narration/static/js/narration",
         "postAceInit":"ep_narration/static/js/narration",
-        "handleClientMessage_narration":"ep_narration/static/js/narration"
+        "handleClientTimesliderMessage_narrationLoadSuccess":"ep_narration/static/js/narration"
       }
     }
   ]

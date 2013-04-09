@@ -14,7 +14,7 @@ exports.postAceInit = function(hook, context){
 }
 
 /* What to do when we recieve the narration information from the server */
-exports.handleClientMessage_narration = function(hook, context){
+exports.handleClientTimesliderMessage_narrationLoadSuccess = function(hook, context){
   narration.recieve(context);
 }
 
@@ -88,7 +88,7 @@ var narration = {
   
   /* recieved cues from server, shove em into our page */
   recieve: function(msg){
-    narration.cues = msg.data.data.cues;    
+    narration.cues = msg.payload.cues;    
     
     console.log("cues recieved:", narration.cues, msg);
     
