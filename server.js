@@ -24,12 +24,9 @@ exports.handleMessage = function(hook_name, context, callback){
     if (context.message.data.type == 'NARRATION_LOAD' ) { // if it's a request to save a narration
       var padId = context.message.data.padId;
       db.get("ep_narration:" + padId, function(err, value){ // get the current value
-        context.client.json.send({ type: "COLLABROOM",
-          data:{
-            type: "narrationLoadSuccess",
-            data: value,
-            payload: true
-          }
+        context.client.json.send({ 
+          type: "narrationLoadSuccess",
+          payload: value
         });
       });
       
