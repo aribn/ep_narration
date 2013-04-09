@@ -1,8 +1,13 @@
 #soundCloudTopContainer {
-/*  display:none;*/
-  height:61px;
+  height:170px;
   width:100%;
   text-align:center;
+}
+
+#soundCloudTopContainer > iframe{
+  left:0;
+  height:170px;
+  border:0;
 }
 
 #soundCloudTopContainer div#soundcloud-loading-placeholder { 
